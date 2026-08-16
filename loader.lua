@@ -746,7 +746,7 @@ do
     local build_text = drawing_proxy["new"]("Text", {
         ["Font"] = 1,
         ["Color"] = menu["colors"]["accent"],
-        ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "live" or "private",
+        ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "live" or "live",
         ["Parent"] = logo,
         ["Position"] = udim2_new(1, 5, 0, 19),
         ["Size"] = 14,
@@ -12273,7 +12273,7 @@ do
                     ["Transparency"] = 0,
                     ["ZIndex"] = 2,
                     ["Visible"] = true,
-                    ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "live" or "private",
+                    ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "live" or "live",
                     ["Size"] = 12,
                     ["Font"] = 2,
                     ["Outline"] = true,

@@ -2,6 +2,11 @@
 
 repeat task["wait"]() until game:IsLoaded()
 
+
+if game["PlaceId"] ~= 2788229376 then 
+    return game:GetService("Players")["LocalPlayer"]:Kick("juju dont supporting this place.")
+end
+
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
 end
@@ -19110,7 +19115,7 @@ do
         menu_references["auto_equip_settings"] = menu_references["auto_equip"]:create_settings()
         menu_references["auto_equip_unequip_when"] = menu_references["auto_equip_settings"]:create_element({["name"] = "unequip when"}, {["dropdown"] = {["flag"] = "auto_equip_unequip_when", ["default"] = {"no target"}, ["options"] = {"no target"}, ["multi"] = true}})
         menu_references["auto_equip_gun"] = menu_references["auto_equip_settings"]:create_element({["name"] = "gun"}, {["dropdown"] = {["flag"] = "auto_equip_gun", ["default"] = {"rifle"}, ["options"] = {"double-barrel sg", "flintlock", "revolver", "rifle", "ak47", "p90", "lmg", "aug"}, ["requires_one"] = true, ["multi"] = true}})
-        menu_references["auto_fire_defensive"] = menu_references["general_section"]:create_element({["name"] = "spam resolver"}, {["toggle"] = {["flag"] = "auto_fire_defensive", ["default"] = false}})
+        menu_references["auto_fire_defensive"] = menu_references["general_section"]:create_element({["name"] = "resolver"}, {["toggle"] = {["flag"] = "auto_fire_defensive", ["default"] = false}})
         menu_references["auto_fire_defensive_settings"] = menu_references["auto_fire_defensive"]:create_settings()
         menu_references["void_spam_resolver_position_weight"] = menu_references["auto_fire_defensive_settings"]:create_element({["name"] = "normal position trust"}, {["slider"] = {["flag"] = "void_spam_resolver_position_weight", ["min"] = 0.1, ["max"] = 5, ["default"] = 1.5, ["decimals"] = 2}})
         menu_references["void_spam_resolver_forget_rate"] = menu_references["auto_fire_defensive_settings"]:create_element({["name"] = "forget rate"}, {["slider"] = {["flag"] = "void_spam_resolver_forget_rate", ["min"] = 0, ["max"] = 1000, ["default"] = 80, ["decimals"] = 2, ["suffix"] = "%"}})

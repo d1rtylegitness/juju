@@ -25382,7 +25382,8 @@ end
 
 -- > ( finish loading )
 
-new_notification("welcome back to juju", 5)
+do
+    new_notification("welcome back to juju", 5)
 
     local overlay = core_gui["RobloxPromptGui"]["promptOverlay"]
 

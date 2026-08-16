@@ -10462,21 +10462,16 @@ do
     -- >> ( redeem codes )
 
     create_connection(menu_references["utility_section"]:create_element({["name"] = "redeem codes"}, {["button"] = {}})["on_clicked"], function()
-        local html = game:HttpGet("https://gamerant.com/roblox-da-hood-codes/")
-        local html = html:sub(html:find("All Active Da Hood Codes"), html:find("All Expired Da Hood Codes") - 1)
+    local codes = {
+        "WORLDCUP26",
+        "FOURTH26",
+    }
 
-        local codes = {}
-        for code in html:gmatch("<strong>(.-)</strong>") do
-            if not code:find("%(") then
-                codes[#codes+1] = code:gsub("%s+$", "")
-            end
-        end
-
-        for i = 1, #codes do
-            event:FireServer("EnterPromoCode", codes[i])
-            wait(6)
-        end
-    end)
+    for i = 1, #codes do
+        event:FireServer("EnterPromoCode", codes[i])
+        wait(6)
+    end
+end)
 
     -- >> ( get vehicle )
 

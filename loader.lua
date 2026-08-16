@@ -19100,6 +19100,12 @@ do
     menu_references["general_section"] = menu["groups"]["main"]:create_section("ragebot", "general", 1, 0.7)
         menu_references["ragebot_enabled"] = menu_references["general_section"]:create_element({["name"] = "ragebot"}, {["toggle"] = {["flag"] = "ragebot"}})
         menu_references["auto_fire"] = menu_references["general_section"]:create_element({["name"] = "auto fire"}, {["toggle"] = {["flag"] = "auto_fire", ["default"] = false}})
+        menu_references["auto_fire_settings"] = menu_references["auto_fire"]:create_settings()
+        menu_references["auto_fire_at_target_vehicle"] = menu_references["auto_fire_settings"]:create_element({["name"] = "at target vehicle"}, {["toggle"] = {["flag"] = "auto_fire_at_target_vehicle", ["default"] = true}})
+        menu_references["auto_fire_at_backtrack"] = menu_references["auto_fire_settings"]:create_element({["name"] = "at backtrack"}, {["toggle"] = {["flag"] = "auto_fire_at_backtrack", ["default"] = false}})
+        menu_references["auto_fire_wall_bang"] = menu_references["auto_fire_settings"]:create_element({["name"] = "wall bang"}, {["toggle"] = {["flag"] = "auto_fire_wall_bang", ["default"] = false}})
+        menu_references["auto_fire_always_fire"] = menu_references["auto_fire_settings"]:create_element({["name"] = "always fire"}, {["toggle"] = {["flag"] = "auto_fire_always_fire", ["default"] = true}})
+        menu_references["auto_fire_dont_render"] = menu_references["auto_fire_settings"]:create_element({["name"] = "dont render"}, {["toggle"] = {["flag"] = "auto_fire_dont_render", ["default"] = false}})
         menu_references["auto_equip"] = menu_references["general_section"]:create_element({["name"] = "auto equip"}, {["toggle"] = {["flag"] = "auto_equip", ["default"] = false}})
         menu_references["auto_equip_settings"] = menu_references["auto_equip"]:create_settings()
         menu_references["auto_equip_unequip_when"] = menu_references["auto_equip_settings"]:create_element({["name"] = "unequip when"}, {["dropdown"] = {["flag"] = "auto_equip_unequip_when", ["default"] = {"no target"}, ["options"] = {"no target"}, ["multi"] = true}})
@@ -19616,6 +19622,7 @@ do
 
     local fire_cooldown = flags["fire_cooldown"]/1000
     local target_cooldown = flags["target_selection_cooldown"]
+    local auto_fire_always_fire = flags["auto_fire_always_fire"]
 
     local target_changed_signal = signals["on_ragebot_target_changed"]
     local defensive_positions = {}
@@ -19698,6 +19705,9 @@ do
             local parts = target[4]
             local hitbox = parts[ragebot_hitbox]
 
+            if flags["auto_fire_at_target_vehicle"] then
+                hitbox = target[19] or hitbox
+            end
 
             local torso = parts["HumanoidRootPart"]
             local is_rifle = local_tool and (local_tool["Name"] == "[Rifle]" or local_tool["Name"] == "[Flintlock]") or false
@@ -19765,9 +19775,21 @@ do
                     ragebot_aim_position+=(target_velocity*(prediction == 0 and local_ping/500 or prediction == 2 and 0 or prediction))
                 end
 
+                if flags["auto_fire_at_backtrack"] then
+                    local data = backtrack_data[target[2]]
+
+                    if data then
+                        local hitbox = data[2][ragebot_hitbox]
+
+                        if hitbox then
+                            hitbox_position = hitbox["Position"]
+                            ragebot_aim_position = hitbox_position
+                        end
+                    end
+                end
             
                 local local_server_position = local_server_position["p"]
-                did_defensive = false
+                local did_defensive = false
             
                 if flags["auto_fire_defensive"] then
                     local weight_to_add = (hitbox_position["Magnitude"] < 9e5 and void_spam_resolver_position_weight or void_spam_resolver_void_weight)
@@ -19816,45 +19838,79 @@ do
                     custom_ragebot_aim_position = nil
                 end
 
-if flags["auto_fire"] and not target[18] and not target[7] and ragebot_aim_position then
-    local now = clock()
-    if now - last_fire > fire_cooldown then
-        local shot_delay = flags["shot_delay"]
-        if shot_delay > 0 then
-            wait(shot_delay / 1000)
-        end
-        if local_gun then
-            for handle, gun_data in local_guns do
-                local ammo = gun_data[3]
-                local parent = handle["Parent"]
-                if ammo > 0 and parent then
-                    last_fire = clock()
-                    setthreadidentity(8)
-                    getfenv(shoot)["require"] = require
-                    shoot({
-                        Shooter = local_character,
-                        Handle = handle,
-                        ForcedOrigin = local_server_position,
-                        AimPosition = ragebot_aim_position,
-                        BeamColor = color3_fromrgb(1, 0.545098, 0.14902),
-                        Range = gun_data[2]
-                    })
-                    local origin = local_server_position
-                    local pos = ragebot_aim_position
-                    local dir = (pos - origin)
-                    local Magnitude = dir["Magnitude"]
-                    for i = 1, ragebot_force_position and 2 or 1 do
-                        event:FireServer("ShootGun", handle, origin, pos, hitbox, (Magnitude <= 0 or Magnitude ~= Magnitude) and ((handle["Position"]) - pos)["Unit"] or dir)
+                local is_rifle = nil
+                for handle, local_gun in local_guns do
+                    local parent = handle["Parent"]
+                    if parent and (parent["Name"] == "[Rifle]" or parent["Name"] == "[Flintlock]") then
+                        is_rifle = true
+                        break
                     end
-                    spawn(get_bullet_result, target[2], hitbox, origin, pos, target_velocity, did_defensive)
-                    getfenv(shoot)["require"] = nil
-                    setthreadidentity(4)
                 end
-            end
-        end
-    end
-end
 
+                if local_gun and (((not local_reloading or auto_fire_always_fire) and not target[18] and not target[7] and (is_rifle or (not forcefield2 and not forcefield)) and not grabbing_constraint) and (flags["auto_fire"] and (auto_fire_always_fire or (((local_server_position-ragebot_aim_position)["Magnitude"] <= local_gun) or flags["follow_target"] or did_defensive)) and old_time-last_fire > fire_cooldown)) then
+                    local delay = flags["shot_delay"]
+                    if delay > 0 then
+                        wait(delay/1000)
+                    end
+
+                    if local_gun then
+                        local new_local_guns = {}
+                        for handle, local_gun in local_guns do
+                            local parent = handle["Parent"]
+
+                            if parent and parent["Name"] == "[Rifle]" then
+                                new_local_guns[#new_local_guns+1] = local_gun
+                            end
+                        end
+                        for handle, local_gun in local_guns do
+                            local parent = handle["Parent"]
+
+                            if parent and parent["Name"] ~= "[Rifle]" then
+                                new_local_guns[#new_local_guns+1] = local_gun
+                            end
+                        end
+
+                        local pos = ragebot_aim_position
+                        local origin = local_server_position
+
+                        for i = 1, #new_local_guns do
+                            local local_gun = new_local_guns[i]
+                            local handle = local_gun[1]
+                            local ammo = local_gun[3]
+
+                            if ammo > 0 and handle["Parent"] and ((handle["Parent"]["Name"] == "[Rifle]" or handle["Parent"]["Name"] == "[Flintlock]") or (not target[4]["ForceField"] and not target[4]["FORCEFIELD"])) then
+                                last_fire = clock()
+                                setthreadidentity(8)
+                                getfenv(shoot)["require"] = require
+                                if not flags["auto_fire_dont_render"] then
+                                    shoot({
+                                        Shooter = local_character,
+                                        Handle = handle,
+                                        ForcedOrigin = origin,
+                                        AimPosition = pos,
+                                        BeamColor = color3_fromrgb(1, 0.545098, 0.14902),
+                                        Range = local_gun[2]
+                                    })
+                                end
+
+                                local dir = (pos-origin)
+                                local Magnitude = dir["Magnitude"]
+                                
+                                for i = 1, ragebot_force_position and 2 or 1 do
+                                    event:FireServer("ShootGun", handle, origin, pos, hitbox, (Magnitude <= 0 or Magnitude ~= Magnitude) and ((handle["Position"])-pos)["Unit"] or dir)
+                                end
+
+                                spawn(get_bullet_result, target[2], hitbox, origin, pos, target_velocity, did_defensive)
+
+                                getfenv(shoot)["require"] = nil
+                                setthreadidentity(4)
+                            end
+                        end
+                    end
+                end
+            else
+                target_last_position = nil
+                ragebot_aim_position = nil
             end
         end
 

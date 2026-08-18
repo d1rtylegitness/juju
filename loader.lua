@@ -2,11 +2,6 @@
 
 repeat task["wait"]() until game:IsLoaded()
 
-
-if game["PlaceId"] ~= 2788229376 then 
-    return game:GetService("Players")["LocalPlayer"]:Kick("juju dont supporting this place.")
-end
-
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
 end

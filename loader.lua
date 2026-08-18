@@ -8723,7 +8723,7 @@ do
                         local Magnitude = dir["Magnitude"]
                         local part = ragebot_target[4][flags["ragebot_hitbox"][1] == "head" and "Head" or "UpperTorso"]
                         
-                        spawn(get_bullet_result, ragebot_target[2], part)
+                        spawn(get_bullet_result, ragebot_target[2], part, origin, pos, vector3_zero, is_defensive_active and is_defensive_active())
 
                         return old_namecall(self, "ShootGun", handle, origin, pos, part, (Magnitude <= 0 or Magnitude ~= Magnitude) and (handle["Position"]-pos)["Unit"] or dir)
                     end

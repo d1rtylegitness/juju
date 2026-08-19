@@ -8627,7 +8627,7 @@ do
             older_health = data[9]
             older_data = data
 
-            local message = old_server_position and " (pred miss: "..tostring(round((aim_position-part["Position"])["Magnitude"], 1))..") (velocity: "..tostring(round((target_velocity or vector3_zero)["Magnitude"], 1))..(did_defensive and ") (defensive: true)" or ") (defensive: false)")
+            local message = old_server_position and " pred miss: "..tostring(round((aim_position-part["Position"])["Magnitude"], 1)).." velocity: "..tostring(round((target_velocity or vector3_zero)["Magnitude"], 1))..(did_defensive and " defensive: true" or " defensive: false")
 
             if shot_count == old_count then
                 return signals["on_local_bullet_failed"]:Fire(player, part, not local_parts["Head"] and "death" or "unknown"..(message or ""), shot_count)

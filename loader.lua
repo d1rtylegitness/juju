@@ -19251,7 +19251,7 @@ do
     local ragebot_ignore_if_invulnerable = true
     local ragebot_ignore_if_in_void = false
     local ragebot_ignore_if_knocked = false
-    local resolver_rate = 0.016
+    local resolver_rate = 0.043
 
     local target_last_position = nil
     local target_velocity = nil
@@ -19778,7 +19778,7 @@ do
                     local done = false
             
                     for position, data in defensive_positions do
-                        if (position - hitbox_position).magnitude <= 100 then
+                        if (position - hitbox_position).magnitude <= 55 then
                             local new_position = position:Lerp(hitbox_position, void_spam_resolver_lerp)
                         
                             defensive_positions[new_position] = {

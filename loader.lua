@@ -19251,7 +19251,7 @@ do
     local ragebot_ignore_if_invulnerable = true
     local ragebot_ignore_if_in_void = false
     local ragebot_ignore_if_knocked = false
-    local resolver_rate = 0.043
+    local resolver_rate = 0.016
 
     local target_last_position = nil
     local target_velocity = nil
@@ -19608,10 +19608,10 @@ do
 
     local target_changed_signal = signals["on_ragebot_target_changed"]
     local defensive_positions = {}
-    local void_spam_resolver_accuracy = 1.35
+    local void_spam_resolver_accuracy = 0.85
     local void_spam_resolver_lerp = 0.1
     local void_spam_resolver_void_weight = 0.2
-    local void_spam_resolver_position_weight = 1.5
+    local void_spam_resolver_position_weight = 2.6
 
     set_ragebot_target = LPH_NO_VIRTUALIZE(function(target, message)
         if ragebot_target == target then
@@ -19778,7 +19778,7 @@ do
                     local done = false
             
                     for position, data in defensive_positions do
-                        if (position - hitbox_position).magnitude <= 200 then
+                        if (position - hitbox_position).magnitude <= 100 then
                             local new_position = position:Lerp(hitbox_position, void_spam_resolver_lerp)
                         
                             defensive_positions[new_position] = {

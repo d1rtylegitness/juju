@@ -9,7 +9,7 @@ if placeId == 2788229376 then
         "https://raw.githubusercontent.com/d1rtylegitness/juju/main/loader.lua"
     ))()
 
-elseif placeId == 9825515356 then
+elseif placeId == 3634139746 then
     loadstring(game:HttpGet(
         "https://raw.githubusercontent.com/d1rtylegitness/juju/main/hc.lua"
     ))()

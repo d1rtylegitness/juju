@@ -2,8 +2,18 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-if game.PlaceId ~= 2788229376 then
-    game.Players.LocalPlayer:Kick("This place is not supported.")
+local placeId = game.PlaceId
+
+if placeId == 2788229376 then
+    loadstring(game:HttpGet(
+        "https://raw.githubusercontent.com/d1rtylegitness/juju/main/loader.lua"
+    ))()
+
+elseif placeId == 9825515356 then
+    loadstring(game:HttpGet(
+        "https://raw.githubusercontent.com/d1rtylegitness/juju/main/hc.lua"
+    ))()
+
 else
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/d1rtylegitness/juju/main/loader.lua"))()
+    game.Players.LocalPlayer:Kick("This place is not supported.")
 end
